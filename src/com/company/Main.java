@@ -3,6 +3,7 @@ package com.company;
 public class Main {
 
     public static void main(String[] args) {
-         MainPage mp = new MainPage();
+        System.out.println("Program started.");
+         Gate gate = new Gate();
     }
 }

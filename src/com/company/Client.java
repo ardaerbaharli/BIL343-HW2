@@ -7,6 +7,7 @@ public class Client {
     private boolean parentalControl;
 
     public Client(String username, String password, SubscriptionPlan subscriptionPlan) {
+        System.out.println("Creating a client.");
         this.setUsername(username);
         this.setPassword(password);
         this.setSubscriptionPlan(subscriptionPlan);
