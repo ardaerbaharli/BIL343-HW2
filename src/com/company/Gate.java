@@ -27,29 +27,27 @@ class Form extends JPanel {
         setBorder(BorderFactory.createTitledBorder(null, formType.name(), 0, 0, null, fg));
 
         lblUsername = new JLabel("Username:");
-        txtUsername = new JTextField(20);
         lblUsername.setLabelFor(txtUsername);
+        lblUsername.setForeground(fg);
         lblUsername.setBorder(new LineBorder(null, 0, false));
 
-        lblPassword = new JLabel("Password:");
-        txtPassword = new JTextField(20);
-        lblPassword.setLabelFor(txtUsername);
-        lblPassword.setBorder(new LineBorder(null, 0, false));
-
-        btnSubmit = new JButton();
-        btnSubmit.setHorizontalAlignment(SwingConstants.CENTER);
-
-        lblUsername.setForeground(fg);
-        lblPassword.setForeground(fg);
-
+        txtUsername = new JTextField(20);
         txtUsername.setForeground(fg);
         txtUsername.setBackground(bg);
         txtUsername.setBorder(BorderFactory.createLineBorder(fg));
 
+        lblPassword = new JLabel("Password:");
+        lblPassword.setLabelFor(txtPassword);
+        lblPassword.setForeground(fg);
+        lblPassword.setBorder(new LineBorder(null, 0, false));
+
+        txtPassword = new JTextField(20);
         txtPassword.setForeground(fg);
         txtPassword.setBackground(bg);
         txtPassword.setBorder(BorderFactory.createLineBorder(fg));
 
+        btnSubmit = new JButton();
+        btnSubmit.setHorizontalAlignment(SwingConstants.CENTER);
         btnSubmit.setForeground(fg);
 
         add(lblUsername);
@@ -112,7 +110,7 @@ public class Gate extends JFrame {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setTitle("Main Page");
+        setTitle("Login or Register");
         add(content);
         setResizable(false);
         pack();
@@ -121,7 +119,7 @@ public class Gate extends JFrame {
 
     private void loginButton_Clicked(Client client) {
         System.out.println("Login button clicked.");
-        if (ValidateClientInfo(client))
+        if (!Validation.ClientInfo(client))
             return;
 
         try {
@@ -129,17 +127,16 @@ public class Gate extends JFrame {
                 throw new ClientDoesNotExistException();
             else {
                 Client currentUser = db.GetRecord(client.getUsername());
-                MainPage mp = new MainPage(currentUser);
+                MainPage mp = new MainPage(currentUser, db);
             }
         } catch (ClientDoesNotExistException ex) {
-            System.out.println(ex.getMessage());
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }
 
     }
 
     private void registerButton_Clicked(Client client) {
-        if (ValidateClientInfo(client))
+        if (!Validation.ClientInfo(client))
             return;
 
         try {
@@ -150,7 +147,8 @@ public class Gate extends JFrame {
                 if (!result)
                     throw new RegistrationFailedException();
                 else {
-                    MainPage mp = new MainPage(client);
+                    System.out.println("Loading the main page.");
+                    MainPage mp = new MainPage(client, db);
                 }
             }
         } catch (RuntimeException ex) {
@@ -159,22 +157,5 @@ public class Gate extends JFrame {
         }
     }
 
-    private boolean ValidateClientInfo(Client client) {
-        System.out.println("Validating client info.");
-        try {
-            if (client.getUsername().length() < 1)
-                throw new EmptyUsernameException();
-
-            if (client.getPassword().length() < 1)
-                throw new EmptyPasswordException();
-
-            System.out.println("Validation successful.");
-            return true;
-        } catch (ValidationException ex) {
-            System.out.println(ex.getMessage());
-            JOptionPane.showMessageDialog(null, ex.getMessage());
-            return false;
-        }
-    }
 }
 

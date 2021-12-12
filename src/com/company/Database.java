@@ -12,7 +12,7 @@ public class Database {
     }
 
     public boolean InsertRecord(Client client) {
-        System.out.println("Insetring a record.");
+        System.out.println("Inserting a record.");
         return true;
 
     }
@@ -32,6 +32,11 @@ public class Database {
 
     public Client GetRecord(String username) {
         System.out.println("Retrieving a client.");
-        return new Client("", "", null);
+        return new Client(username, "", null);
+    }
+
+    public boolean UpdateUser(String username, Client updatedClient) {
+        System.out.println("Updating client info.");
+        return true;
     }
 }
