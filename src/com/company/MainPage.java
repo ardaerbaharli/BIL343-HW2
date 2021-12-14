@@ -1,27 +1,32 @@
 package com.company;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
-import javax.xml.bind.ValidationException;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MainPage extends JFrame {
-    private Client currentUser;
+    private User user;
     private JPanel content;
     private Database db;
+    private Color bg, fg;
 
-    public MainPage(Client client, Database db) {
+    public MainPage(User user, Database db) {
         System.out.println("Setting up the main page.");
-        currentUser = client;
+        this.user = user;
         this.db = db;
+        bg = new Color(41, 41, 41);
+        fg = Color.white;
 
-        Color bg = new Color(41, 41, 41);
-        Color fg = Color.white;
+        content = new JPanel();
+        content.setOpaque(true);
+        content.setLayout(new FlowLayout());
+        content.setBackground(bg);
 
-        ShowVideos();
+        JPanel navBar = getNavBar();
+
+        content.add(navBar);
+
+        showVideos();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -34,28 +39,19 @@ public class MainPage extends JFrame {
         setVisible(true);
     }
 
-    private Color bg, fg;
 
-    private void ShowVideos() {
-        bg = new Color(41, 41, 41);
-        fg = Color.white;
+    private void showVideos() {
 
-        content = new JPanel();
-        content.setOpaque(true);
-        content.setLayout(new FlowLayout());
-        content.setBackground(bg);
 
-        JPanel navBar = CreateNavBar();
-
-        content.add(navBar);
-
-        String genres[] = new String[]{"Action", "Fantasy", "Drama", "Comedy"};
-        String movieNames[][] = new String[][]{
-                {"Red Notice", "John Wick", "Extraction", "Fast&Furious 5"},
-                {"Mortal Kombat", "Legion", "Lord Of The Rings", "Pirates of Caribbean"},
+        String[] genres = new String[]{"Action", "Fantasy", "Drama", "Comedy"};
+        String[][] movieNames = new String[][]{
+                {"Red Notice", "John Wick", "Extraction", "Fast & Furious 5"},
+                {"Mortal Kombat", "Legion", "Lord Of The Rings", "Pirates of the Caribbean"},
                 {"Casablanca", "Knives Out", "The Irishman", "The Godfather"},
                 {"Bad Boys", "The Dictator", "Ted", "The Hangover"}};
 
+        Dimension videoSize = new Dimension(192, 108);
+        Dimension panelSize = new Dimension(192, 180);
         for (int i = 0; i < 4; i++) {
             JLabel genreName = new JLabel(genres[i]);
             genreName.setForeground(Color.white);
@@ -64,15 +60,41 @@ public class MainPage extends JFrame {
             JPanel videos = new JPanel(new FlowLayout());
             videos.setPreferredSize(new Dimension(800, 200));
             for (int j = 0; j < 4; j++) {
-                videos.add(new Video(movieNames[i][j]));
+                Video v = new Video(movieNames[i][j], videoSize, panelSize);
+                v.setNeedParentalControl(true);
+                if (user.isParentalControlOn() && v.isNeedParentalControl()) {
+                    JLabel lblParental = new JLabel("Parental control.");
+                    lblParental.setForeground(fg);
+                    v.add(lblParental);
+                } else {
+                    JButton btnMovie = new JButton("Watch");
+                    btnMovie.setVerticalAlignment(SwingConstants.CENTER);
+                    btnMovie.setForeground(fg);
+                    btnMovie.addActionListener(
+                            actionEvent -> btnMovie_Clicked(v.getMovieName())
+                    );
+                    v.add(btnMovie);
+                }
+
+                videos.add(v);
+
             }
 
             videos.setBackground(bg);
             content.add(videos);
         }
+
+//        JScrollPane scrollableTextArea = new JScrollPane(content);
+//        scrollableTextArea.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+//        add(scrollableTextArea);
     }
 
-    private JPanel CreateNavBar() {
+    private void btnMovie_Clicked(String movieName) {
+        new VideoPage(user, db, movieName);
+        dispose();
+    }
+
+    private JPanel getNavBar() {
         JPanel navBar = new JPanel();
         navBar.setPreferredSize(new Dimension(800, 30));
         navBar.setBackground(bg);
@@ -80,26 +102,22 @@ public class MainPage extends JFrame {
         navBar.setLayout(new BorderLayout());
 
 
-        JLabel lblUsername = new JLabel(currentUser.getUsername());
+        JLabel lblUsername = new JLabel(user.getUsername());
         lblUsername.setForeground(fg);
         navBar.add(lblUsername, BorderLayout.LINE_START);
 
         JButton btnAccount = new JButton("Account");
         btnAccount.setForeground(fg);
         btnAccount.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        accountButton_Clicked(currentUser);
-                    }
-                }
+                actionEvent -> accountButton_Clicked()
         );
         navBar.add(btnAccount, BorderLayout.LINE_END);
 
         return navBar;
     }
 
-    private void accountButton_Clicked(Client currentUser) {
-
-        AccountPage ap = new AccountPage(currentUser,db);
+    private void accountButton_Clicked() {
+        new AccountPage(user, db);
+        dispose();
     }
 }

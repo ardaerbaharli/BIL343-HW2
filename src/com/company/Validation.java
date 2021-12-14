@@ -4,14 +4,14 @@ import javax.swing.*;
 import javax.xml.bind.ValidationException;
 
 public class Validation {
-    public static boolean ClientInfo(Client client)
+    public static boolean clientInfo(User user)
     {
         System.out.println("Validating client info.");
         try {
-            if (client.getUsername().length() < 1)
+            if (user.getUsername().length() < 1)
                 throw new EmptyUsernameException();
 
-            if (client.getPassword().length() < 1)
+            if (user.getPassword().length() < 1)
                 throw new EmptyPasswordException();
 
             System.out.println("Validation successful.");

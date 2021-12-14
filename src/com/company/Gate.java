@@ -2,11 +2,9 @@ package com.company;
 
 import javax.swing.*; // Buttons, text fields, ...
 import java.awt.*; // Container, Color,
-import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
-import java.awt.event.*;//ActionListener
+import java.time.LocalDate;
 import javax.swing.JOptionPane;
-import javax.xml.bind.ValidationException;
 
 
 class Form extends JPanel {
@@ -14,11 +12,13 @@ class Form extends JPanel {
     public JLabel lblUsername, lblPassword;
     public JTextField txtUsername, txtPassword;
     public JButton btnSubmit;
+    private final Color bg;
+    private final Color fg;
 
     public Form(FormType formType) {
         System.out.println("Creating " + formType.name() + " form.");
-        Color bg = new Color(41, 41, 41);
-        Color fg = Color.white;
+        bg = new Color(41, 41, 41);
+        fg = Color.white;
 
         setForeground(fg);
         setBackground(bg);
@@ -60,8 +60,8 @@ class Form extends JPanel {
 
 public class Gate extends JFrame {
 
-    private JPanel content;
-    private Database db;
+    private final JPanel content;
+    private final Database db;
 
     public Gate() {
         System.out.println("Setting up the gate forms.");
@@ -77,12 +77,10 @@ public class Gate extends JFrame {
         Form loginForm = new Form(FormType.Login);
         loginForm.btnSubmit.setText("Login");
         loginForm.btnSubmit.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        String username = loginForm.txtUsername.getText();
-                        String password = loginForm.txtPassword.getText();
-                        loginButton_Clicked(new Client(username, password, null));
-                    }
+                actionEvent -> {
+                    String username = loginForm.txtUsername.getText();
+                    String password = loginForm.txtPassword.getText();
+                    loginButton_Clicked(new User(username, password, null));
                 }
         );
 
@@ -96,13 +94,12 @@ public class Gate extends JFrame {
 
         registerForm.btnSubmit.setText("Register");
         registerForm.btnSubmit.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent ae) {
-                        String username = registerForm.txtUsername.getText();
-                        String password = registerForm.txtPassword.getText();
-                        SubscriptionPlan sb = (SubscriptionPlan) cb.getSelectedItem();
-                        registerButton_Clicked(new Client(username, password, sb));
-                    }
+                actionEvent -> {
+                    String username = registerForm.txtUsername.getText();
+                    String password = registerForm.txtPassword.getText();
+                    SubscriptionPlan sb = (SubscriptionPlan) cb.getSelectedItem();
+                    Subscription subscription = new Subscription(sb, username, LocalDate.now());
+                    registerButton_Clicked(new User(username, password, subscription), subscription);
                 }
         );
 
@@ -117,17 +114,23 @@ public class Gate extends JFrame {
         setVisible(true);
     }
 
-    private void loginButton_Clicked(Client client) {
+    private void loginButton_Clicked(User user) {
         System.out.println("Login button clicked.");
-        if (!Validation.ClientInfo(client))
+        if (!Validation.clientInfo(user))
             return;
+        db.listUsers();
 
         try {
-            if (!db.DoesExists(client.getUsername()))
+            if (!db.doesExistsInUsers(user.getUsername()))
                 throw new ClientDoesNotExistException();
             else {
-                Client currentUser = db.GetRecord(client.getUsername());
-                MainPage mp = new MainPage(currentUser, db);
+                User currentUser = db.getUser(user.getUsername());
+                if (!currentUser.getPassword().equals(user.getPassword())) {
+                    JOptionPane.showMessageDialog(null, "Username or password is not correct!");
+                } else {
+                     new MainPage(currentUser, db);
+                    dispose();
+                }
             }
         } catch (ClientDoesNotExistException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
@@ -135,20 +138,22 @@ public class Gate extends JFrame {
 
     }
 
-    private void registerButton_Clicked(Client client) {
-        if (!Validation.ClientInfo(client))
+    private void registerButton_Clicked(User user, Subscription subscription) {
+        if (!Validation.clientInfo(user))
             return;
 
         try {
-            if (db.DoesExists(client.getUsername()))
+            if (db.doesExistsInUsers(user.getUsername()))
                 throw new ClientAlreadyExistsException();
             else {
-                boolean result = db.InsertRecord(client);
+                boolean result = db.insertUser(user);
+                db.insertSubscription(subscription);
                 if (!result)
                     throw new RegistrationFailedException();
                 else {
                     System.out.println("Loading the main page.");
-                    MainPage mp = new MainPage(client, db);
+                     new MainPage(user, db);
+                    dispose();
                 }
             }
         } catch (RuntimeException ex) {
@@ -156,6 +161,5 @@ public class Gate extends JFrame {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }
     }
-
 }
 
