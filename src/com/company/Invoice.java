@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class Invoice {
+    private final String directory ="Invoice";
     private final String fileExtension = "html";
 
     private String fileName;
@@ -13,7 +14,9 @@ public class Invoice {
     public Invoice(Subscription subscription) {
         try {
             System.out.println("Creating an invoice.");
-            fileName = String.format("%s %s-%s.%s",
+            new File(directory).mkdirs();
+            fileName = String.format("%s/%s %s-%s.%s",
+                    directory,
                     subscription.getUsername(),
                     subscription.getSubscriptionPlan(),
                     subscription.getDate(),

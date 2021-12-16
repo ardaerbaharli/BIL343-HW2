@@ -26,16 +26,20 @@ public class MainPage extends JFrame {
 
         content.add(navBar);
 
-
-        JPanel videos = showVideos();
+        JPanel videos = createVideoPanel();
         JScrollPane scrollableTextArea = new JScrollPane(videos);
+        scrollableTextArea.setPreferredSize(new Dimension(800, 570));
         scrollableTextArea.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollableTextArea.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+
         content.add(scrollableTextArea);
+
+        add(content);
+
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Main Page");
-        add(content);
         setResizable(false);
         setBackground(bg);
 
@@ -45,16 +49,16 @@ public class MainPage extends JFrame {
     }
 
 
-    private JPanel showVideos() {
+    private JPanel createVideoPanel() {
         String[] genres;
         String[][] movieNames;
 
         if (user.getLatestSubscription().getSubscriptionPlan() == SubscriptionPlan.Free) {
-            genres = new String[]{ "Fantasy", "Drama", "Comedy"};
+            genres = new String[]{"Fantasy", "Drama", "Comedy"};
             movieNames = new String[][]{
                     {"Mortal Kombat", "Legion", "Pirates of the Caribbean"},
-                    {"Casablanca",  "The Godfather"},
-                    {"Bad Boys",  "Ted", "The Hangover"}};
+                    {"Casablanca", "The Godfather"},
+                    {"Bad Boys", "Ted", "The Hangover"}};
         } else {
             genres = new String[]{"Action", "Fantasy", "Drama", "Comedy"};
             movieNames = new String[][]{
@@ -66,7 +70,7 @@ public class MainPage extends JFrame {
 
         JPanel videosPanel = new JPanel();
         videosPanel.setLayout(new FlowLayout());
-        videosPanel.setPreferredSize(new Dimension(800, 750));
+        videosPanel.setPreferredSize(new Dimension(800, 1000));
 
         videosPanel.setBackground(bg);
 
@@ -82,10 +86,12 @@ public class MainPage extends JFrame {
 
             for (int j = 0; j < movieNames[i].length; j++) {
                 Video video = new Video(movieNames[i][j], videoSize, panelSize);
+
                 if (video.getMovieName().contains("a"))
                     video.setNeedParentalControl(true);
                 else
                     video.setNeedParentalControl(false);
+
                 if (user.isParentalControlOn() && video.isNeedParentalControl()) {
                     JLabel lblParental = new JLabel("Parental control.");
                     lblParental.setForeground(fg);
@@ -101,7 +107,6 @@ public class MainPage extends JFrame {
                 }
 
                 videosLine.add(video);
-
             }
 
             videosLine.setBackground(bg);

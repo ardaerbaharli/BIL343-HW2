@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class Report {
+    private final String directory ="Report";
     private final String fileExtension = "html";
 
     private String fileName;
@@ -15,8 +16,9 @@ public class Report {
     public Report(List<Subscription> subs, List<User> users) {
         try {
             System.out.println("Creating platform report.");
-
-            fileName = String.format("PlatformReport-%s.%s",
+            new File(directory).mkdirs();
+            fileName = String.format("%s/PlatformReport-%s.%s",
+                    directory,
                     LocalDate.now(),
                     fileExtension);
 
@@ -130,7 +132,7 @@ public class Report {
                 }
             }
 
-            c += "    <h3>Subscription plan: " + subs.get(i).getSubscriptionPlan() + "</h3>\n" +
+            c += "    <h3>Subscription plan: " + SubscriptionPlan.values()[i] + "</h3>\n" +
                     "    <h3>Current number of subscribers: " + currentSubCount + "</h3>\n" +
                     "    <h3>Total number of renewals: " + renewalCounter + "</h3>\n" +
                     "    <br>\n";

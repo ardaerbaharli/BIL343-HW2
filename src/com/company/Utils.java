@@ -3,10 +3,10 @@ package com.company;
 import javax.swing.*;
 import javax.xml.bind.ValidationException;
 import java.awt.*;
+import java.io.File;
 
 public class Utils {
-    public static boolean validateUser(User user)
-    {
+    public static boolean validateUser(User user) {
         System.out.println("Validating user info.");
         try {
             if (user.getUsername().length() < 1)
@@ -25,9 +25,16 @@ public class Utils {
     }
 
     public static JPanel getPlaceholderPanel() {
-        Color bg = new Color(41,41,41);
+        Color bg = new Color(41, 41, 41);
         JPanel p = new JPanel();
         p.setBackground(bg);
         return p;
+    }
+
+    public static void cleanDirectory(String directoryPath) {
+        File directory = new File(directoryPath);
+        for (File file : directory.listFiles())
+            if (!file.isDirectory())
+                file.delete();
     }
 }
