@@ -4,14 +4,20 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AccountPage extends JFrame {
 
     private JLabel lblUsername, lblPassword, lblSubscriptionPlan, lblParental;
     private JTextField txtUsername, txtPassword;
     private JCheckBox checkParental;
-    private JButton btnUpdate, btnRenewSubscription, btnInvoices;
+    private JButton btnUpdate, btnRenewSubscription, btnInvoices, btnBack, btnReports;
     private JComboBox cbSubscriptionPlan;
+    private JList invoiceList;
+    private DefaultListModel invoiceListModel;
+    private JPanel panel, topBar, accountSettingsPanel, subscriptionSettingsPanel, invoicesPanel;
 
     private User user;
     private Database db;
@@ -25,23 +31,42 @@ public class AccountPage extends JFrame {
         Color bg = new Color(41, 41, 41);
         Color fg = Color.white;
 
-        JPanel panel = new JPanel();
+        panel = new JPanel();
         panel.setForeground(fg);
         panel.setBackground(bg);
 
-        panel.setLayout(new GridLayout(4, 1, 2, 2));
+        panel.setLayout(new FlowLayout());
+        //////////      //////////      //////////      //////////
+        topBar = new JPanel();
+        topBar.setPreferredSize(new Dimension(400, 30));
+        topBar.setBackground(bg);
+        topBar.setForeground(fg);
 
-        JButton btnBack = new JButton("Back");
+        topBar.setLayout(new BorderLayout());
+
+
+        btnBack = new JButton();
+        btnBack.setText("Back");
         btnBack.setForeground(fg);
         btnBack.addActionListener(
                 actionEvent -> btnBack_Clicked()
         );
-        panel.add(btnBack);
+        topBar.add(btnBack, BorderLayout.LINE_START);
 
-        JPanel accountSettingsPanel = new JPanel();
+        btnReports = new JButton();
+        btnReports.setText("Reports");
+        btnReports.setForeground(fg);
+        btnReports.addActionListener(
+                actionEvent -> btnReports_Clicked()
+        );
+
+        topBar.add(btnReports, BorderLayout.LINE_END);
+
+        //////////      //////////      //////////      //////////
+        accountSettingsPanel = new JPanel();
         accountSettingsPanel.setForeground(fg);
         accountSettingsPanel.setBackground(bg);
-
+        accountSettingsPanel.setPreferredSize(new Dimension(400, 170));
         accountSettingsPanel.setLayout(new GridLayout(4, 2, 2, 2));
         accountSettingsPanel.setBorder(BorderFactory.createTitledBorder(null, "Account Settings", TitledBorder.CENTER, 0, null, fg));
 
@@ -93,8 +118,19 @@ public class AccountPage extends JFrame {
                 }
         );
 
-        btnUpdate.setBorder(BorderFactory.createLineBorder(fg));
+        accountSettingsPanel.add(lblUsername);
+        accountSettingsPanel.add(txtUsername);
 
+        accountSettingsPanel.add(lblPassword);
+        accountSettingsPanel.add(txtPassword);
+
+        accountSettingsPanel.add(lblParental);
+        accountSettingsPanel.add(checkParental);
+
+        accountSettingsPanel.add(Utils.getPlaceholderPanel());
+        accountSettingsPanel.add(btnUpdate);
+
+        //////////      //////////      //////////      //////////
 
         lblSubscriptionPlan = new JLabel("Subscription Plan:");
         lblSubscriptionPlan.setLabelFor(cbSubscriptionPlan);
@@ -117,82 +153,117 @@ public class AccountPage extends JFrame {
                 }
         );
 
-        accountSettingsPanel.add(lblUsername);
-        accountSettingsPanel.add(txtUsername);
 
-        accountSettingsPanel.add(lblPassword);
-        accountSettingsPanel.add(txtPassword);
-
-        accountSettingsPanel.add(lblParental);
-        accountSettingsPanel.add(checkParental);
-
-        accountSettingsPanel.add(btnUpdate);
-
-        JPanel subscriptionSettingsPanel = new JPanel();
+        subscriptionSettingsPanel = new JPanel();
         subscriptionSettingsPanel.setForeground(fg);
         subscriptionSettingsPanel.setBackground(bg);
+        subscriptionSettingsPanel.setPreferredSize(new Dimension(400, 100));
 
         subscriptionSettingsPanel.setLayout(new GridLayout(2, 2, 2, 2));
         subscriptionSettingsPanel.setBorder(BorderFactory.createTitledBorder(null, "Subscription Settings", TitledBorder.CENTER, 0, null, fg));
 
         subscriptionSettingsPanel.add(lblSubscriptionPlan);
         subscriptionSettingsPanel.add(cbSubscriptionPlan);
+
+        subscriptionSettingsPanel.add(Utils.getPlaceholderPanel());
         subscriptionSettingsPanel.add(btnRenewSubscription);
 
-        JPanel invoicesPanel = new JPanel();
+        //////////      //////////      //////////      //////////
+        invoicesPanel = new JPanel();
         invoicesPanel.setForeground(fg);
         invoicesPanel.setBackground(bg);
+        invoicesPanel.setPreferredSize(new Dimension(400, 100));
 
+//        invoicesPanel.setLayout(new GridLayout(2, 2, 2, 2));
         invoicesPanel.setLayout(new FlowLayout());
         invoicesPanel.setBorder(BorderFactory.createTitledBorder(null, "Invoices", TitledBorder.CENTER, 0, null, fg));
 
         btnInvoices = new JButton();
-        btnInvoices.setText("Show Invoices");
+        btnInvoices.setText("Show Invoice");
         btnInvoices.setHorizontalAlignment(SwingConstants.CENTER);
         btnInvoices.setForeground(fg);
         btnInvoices.addActionListener(
                 actionEvent -> btnInvoicesClicked()
         );
 
+        invoiceListModel = new DefaultListModel();
+        invoiceList = new JList(invoiceListModel);
+        invoiceList.setPreferredSize(new Dimension(400, 400));
+        JScrollPane scroll = new JScrollPane(invoiceList);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        invoicesPanel.add(btnInvoices);
+
+        invoicesPanel.add(scroll);
+
+        List<Subscription> subscriptions = user.getSubscriptions();
+        for (Subscription sub : subscriptions) {
+            System.out.println(sub.getInvoice().getFileName());
+            invoiceListModel.addElement(sub.getInvoice().getFileName());
+        }
+        System.out.println(invoiceListModel.size());
+
+        //////////      //////////      //////////      //////////
+        panel.add(topBar);
         panel.add(accountSettingsPanel);
         panel.add(subscriptionSettingsPanel);
+        panel.add(invoicesPanel);
 
-        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         add(panel);
         setTitle("Account");
         setResizable(false);
-        pack();
+        setSize(400, 450);
+        setLocationRelativeTo(null);
+
         setVisible(true);
     }
 
+    private void btnReports_Clicked() {
+        new ReportsPage(user, db);
+        dispose();
+    }
+
     private void btnBack_Clicked() {
-         new MainPage(user, db);
+        new MainPage(user, db);
         dispose();
     }
 
     private void btnInvoicesClicked() {
-        createInvoices();
+        try {
+            if (invoiceList.isSelectionEmpty())
+                throw new SelectionEmptyException();
+
+            String invoiceName = invoiceList.getSelectedValue().toString();
+            Desktop desktop = Desktop.getDesktop();
+            File file = new File(invoiceName);
+            desktop.open(file);
+
+        } catch (SelectionEmptyException e) {
+            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
-    private void createInvoices() {
-
-    }
 
     private void btnRenewSubscriptionClicked(SubscriptionPlan newSubscriptionPlan) {
         Subscription subscription = new Subscription(newSubscriptionPlan, user.getUsername());
         user.renewSubscription(subscription);
         db.insertSubscription(subscription);
 
-        user = db.getUser(user.getUsername());
         db.updateUser(user.getUsername(), user);
+        user = db.getUser(user.getUsername());
+        user.setSubscriptions(db.getSubscriptionsByUsername(user.getUsername()));
 
-         new MainPage(user, db);
+        new MainPage(user, db);
         dispose();
     }
 
     private void btnUpdate_Clicked(String username, User updatedUser) {
-        if (!Validation.clientInfo(updatedUser))
+        if (!Utils.validateUser(updatedUser))
             return;
 
         db.updateUser(username, updatedUser);

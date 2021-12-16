@@ -129,6 +129,36 @@ public class Database {
         }
     }
 
+    public List<Subscription> getAllSubscriptions() {
+        System.out.println("Retrieving all subscriptions.");
+        final String QUERY = "select subscriptionPlan, username, subDate from subscription";
+        try (Connection connection = getConnection();
+
+             PreparedStatement preparedStatement = connection.prepareStatement(QUERY)) {
+
+            ResultSet rs = preparedStatement.executeQuery();
+            List<Subscription> subList = new ArrayList<>();
+
+            while (rs.next()) {
+                SubscriptionPlan sp = SubscriptionPlan.valueOf(rs.getString("subscriptionPlan"));
+                String username = rs.getString("username");
+                LocalDate subDate = rs.getDate("subDate").toLocalDate();
+                Subscription subscription = new Subscription(sp, username, subDate);
+                subList.add(subscription);
+            }
+            return subList;
+        } catch (SQLException e) {
+            printSQLException(e);
+            return null;
+        } finally {
+            try {
+                getConnection().close();
+            } catch (SQLException e) {
+                printSQLException(e);
+            }
+        }
+    }
+
     public List<Subscription> getSubscriptionsByUsername(String username) {
         System.out.println("Retrieving a client.");
         final String QUERY = "select subscriptionPlan, username, subDate from subscription where username =?";
@@ -278,6 +308,37 @@ public class Database {
             }
         } catch (SQLException e) {
             printSQLException(e);
+        } finally {
+            try {
+                getConnection().close();
+            } catch (SQLException e) {
+                printSQLException(e);
+            }
+        }
+    }
+
+    public List<User> getAllUsers() {
+        System.out.println("Retrieving a client.");
+        final String QUERY = "select * from users";
+        try (Connection connection = getConnection();
+
+             PreparedStatement preparedStatement = connection.prepareStatement(QUERY)) {
+
+            ResultSet rs = preparedStatement.executeQuery();
+            List<User> users = new ArrayList<>();
+            while (rs.next()) {
+                String username = rs.getString("username");
+                String password = rs.getString("password");
+                SubscriptionPlan subscriptionPlan = SubscriptionPlan.valueOf(rs.getString("subscriptionPlan"));
+                boolean parentalControl = Boolean.parseBoolean(rs.getString("parentalControl"));
+                User u = new User(username, password, parentalControl);
+                u.setSubscriptions(getSubscriptionsByUsername(username));
+                users.add(u);
+            }
+            return users;
+        } catch (SQLException e) {
+            printSQLException(e);
+            return null;
         } finally {
             try {
                 getConnection().close();

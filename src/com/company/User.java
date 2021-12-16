@@ -17,6 +17,13 @@ public class User {
         this.setParentalControl(false);
     }
 
+    public User(String username, String password, boolean parentalControl) {
+        this.setUsername(username);
+        this.setPassword(password);
+        this.setSubscriptions(new ArrayList<>());
+        this.setParentalControl(false);
+    }
+
 
     public User(String username, String password, Subscription subscription, boolean parentalControl) {
         this.setUsername(username);
@@ -60,7 +67,9 @@ public class User {
     }
 
     public Subscription getLatestSubscription() {
-        return subscriptions.get(subscriptions.size() - 1);
+        if (subscriptions.size() > 0)
+            return subscriptions.get(subscriptions.size() - 1);
+        return null;
     }
 
     public void setSubscriptions(List<Subscription> subscriptions) {
@@ -82,7 +91,7 @@ public class User {
                 new String[]{"144p", "360p", "480p"},
                 new String[]{"144p", "360p", "480p", "720p"}};
 
-        SubscriptionPlan plan= getLatestSubscription().getSubscriptionPlan();
+        SubscriptionPlan plan = getLatestSubscription().getSubscriptionPlan();
         return videoQualities[plan.ordinal()];
 
     }

@@ -2,11 +2,12 @@ package com.company;
 
 import javax.swing.*;
 import javax.xml.bind.ValidationException;
+import java.awt.*;
 
-public class Validation {
-    public static boolean clientInfo(User user)
+public class Utils {
+    public static boolean validateUser(User user)
     {
-        System.out.println("Validating client info.");
+        System.out.println("Validating user info.");
         try {
             if (user.getUsername().length() < 1)
                 throw new EmptyUsernameException();
@@ -21,5 +22,12 @@ public class Validation {
             JOptionPane.showMessageDialog(null, ex.getMessage());
             return false;
         }
+    }
+
+    public static JPanel getPlaceholderPanel() {
+        Color bg = new Color(41,41,41);
+        JPanel p = new JPanel();
+        p.setBackground(bg);
+        return p;
     }
 }

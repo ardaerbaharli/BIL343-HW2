@@ -26,67 +26,89 @@ public class MainPage extends JFrame {
 
         content.add(navBar);
 
-        showVideos();
+
+        JPanel videos = showVideos();
+        JScrollPane scrollableTextArea = new JScrollPane(videos);
+        scrollableTextArea.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollableTextArea.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        content.add(scrollableTextArea);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
         setTitle("Main Page");
         add(content);
         setResizable(false);
         setBackground(bg);
 
         setSize(800, 600);
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
 
-    private void showVideos() {
+    private JPanel showVideos() {
+        String[] genres;
+        String[][] movieNames;
 
+        if (user.getLatestSubscription().getSubscriptionPlan() == SubscriptionPlan.Free) {
+            genres = new String[]{ "Fantasy", "Drama", "Comedy"};
+            movieNames = new String[][]{
+                    {"Mortal Kombat", "Legion", "Pirates of the Caribbean"},
+                    {"Casablanca",  "The Godfather"},
+                    {"Bad Boys",  "Ted", "The Hangover"}};
+        } else {
+            genres = new String[]{"Action", "Fantasy", "Drama", "Comedy"};
+            movieNames = new String[][]{
+                    {"Red Notice", "John Wick", "Extraction", "Fast & Furious 5"},
+                    {"Mortal Kombat", "Legion", "Lord Of The Rings", "Pirates of the Caribbean"},
+                    {"Casablanca", "Knives Out", "The Irishman", "The Godfather"},
+                    {"Bad Boys", "The Dictator", "Ted", "The Hangover"}};
+        }
 
-        String[] genres = new String[]{"Action", "Fantasy", "Drama", "Comedy"};
-        String[][] movieNames = new String[][]{
-                {"Red Notice", "John Wick", "Extraction", "Fast & Furious 5"},
-                {"Mortal Kombat", "Legion", "Lord Of The Rings", "Pirates of the Caribbean"},
-                {"Casablanca", "Knives Out", "The Irishman", "The Godfather"},
-                {"Bad Boys", "The Dictator", "Ted", "The Hangover"}};
+        JPanel videosPanel = new JPanel();
+        videosPanel.setLayout(new FlowLayout());
+        videosPanel.setPreferredSize(new Dimension(800, 750));
+
+        videosPanel.setBackground(bg);
 
         Dimension videoSize = new Dimension(192, 108);
         Dimension panelSize = new Dimension(192, 180);
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < genres.length; i++) {
             JLabel genreName = new JLabel(genres[i]);
             genreName.setForeground(Color.white);
-            content.add(genreName);
+            videosPanel.add(genreName);
 
-            JPanel videos = new JPanel(new FlowLayout());
-            videos.setPreferredSize(new Dimension(800, 200));
-            for (int j = 0; j < 4; j++) {
-                Video v = new Video(movieNames[i][j], videoSize, panelSize);
-                v.setNeedParentalControl(true);
-                if (user.isParentalControlOn() && v.isNeedParentalControl()) {
+            JPanel videosLine = new JPanel(new FlowLayout());
+            videosLine.setPreferredSize(new Dimension(800, 200));
+
+            for (int j = 0; j < movieNames[i].length; j++) {
+                Video video = new Video(movieNames[i][j], videoSize, panelSize);
+                if (video.getMovieName().contains("a"))
+                    video.setNeedParentalControl(true);
+                else
+                    video.setNeedParentalControl(false);
+                if (user.isParentalControlOn() && video.isNeedParentalControl()) {
                     JLabel lblParental = new JLabel("Parental control.");
                     lblParental.setForeground(fg);
-                    v.add(lblParental);
+                    video.add(lblParental);
                 } else {
                     JButton btnMovie = new JButton("Watch");
                     btnMovie.setVerticalAlignment(SwingConstants.CENTER);
                     btnMovie.setForeground(fg);
                     btnMovie.addActionListener(
-                            actionEvent -> btnMovie_Clicked(v.getMovieName())
+                            actionEvent -> btnMovie_Clicked(video.getMovieName())
                     );
-                    v.add(btnMovie);
+                    video.add(btnMovie);
                 }
 
-                videos.add(v);
+                videosLine.add(video);
 
             }
 
-            videos.setBackground(bg);
-            content.add(videos);
+            videosLine.setBackground(bg);
+            videosPanel.add(videosLine);
         }
+        return videosPanel;
 
-//        JScrollPane scrollableTextArea = new JScrollPane(content);
-//        scrollableTextArea.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-//        add(scrollableTextArea);
     }
 
     private void btnMovie_Clicked(String movieName) {

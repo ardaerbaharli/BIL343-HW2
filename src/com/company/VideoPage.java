@@ -3,8 +3,6 @@ package com.company;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class VideoPage extends JFrame {
 
@@ -35,13 +33,14 @@ public class VideoPage extends JFrame {
 
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
         setTitle("Video Page");
         add(content);
         setResizable(false);
         setBackground(bg);
 
         setSize(800, 600);
+        setLocationRelativeTo(null);
+
         setVisible(true);
     }
 
@@ -52,9 +51,9 @@ public class VideoPage extends JFrame {
         videoSettings.setBorder(new LineBorder(Color.lightGray, 1, false));
         videoSettings.setLayout(new GridLayout(1, 6));
 
-        videoSettings.add(getPlaceholderPanel());
-        videoSettings.add(getPlaceholderPanel());
-        videoSettings.add(getPlaceholderPanel());
+        videoSettings.add(Utils.getPlaceholderPanel());
+        videoSettings.add(Utils.getPlaceholderPanel());
+        videoSettings.add(Utils.getPlaceholderPanel());
 
         JSlider volumeSlider = new JSlider();
         JLabel volumeLabel = new JLabel("Volume:");
@@ -70,11 +69,6 @@ public class VideoPage extends JFrame {
         return videoSettings;
     }
 
-    private JPanel getPlaceholderPanel() {
-        JPanel p = new JPanel();
-        p.setBackground(bg);
-        return p;
-    }
 
     private JPanel createNavBar() {
         JPanel navBar = new JPanel();
@@ -82,7 +76,6 @@ public class VideoPage extends JFrame {
         navBar.setBackground(bg);
         navBar.setBorder(new LineBorder(Color.lightGray, 1, false));
         navBar.setLayout(new BorderLayout());
-
 
         JButton btnBack = new JButton("Back");
         btnBack.setForeground(fg);

@@ -4,5 +4,7 @@ public enum SubscriptionPlan {
     Free,
     Basic,
     Standard,
-    Premium
+    Premium;
+
+
 }

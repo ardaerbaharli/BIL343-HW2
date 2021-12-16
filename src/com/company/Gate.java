@@ -106,29 +106,29 @@ public class Gate extends JFrame {
         content.add(registerForm);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
         setTitle("Login or Register");
         add(content);
         setResizable(false);
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
     private void loginButton_Clicked(User user) {
         System.out.println("Login button clicked.");
-        if (!Validation.clientInfo(user))
+        if (!Utils.validateUser(user))
             return;
-        db.listUsers();
 
         try {
             if (!db.doesExistsInUsers(user.getUsername()))
                 throw new ClientDoesNotExistException();
             else {
                 User currentUser = db.getUser(user.getUsername());
+                currentUser.setSubscriptions(db.getSubscriptionsByUsername(currentUser.getUsername()));
                 if (!currentUser.getPassword().equals(user.getPassword())) {
                     JOptionPane.showMessageDialog(null, "Username or password is not correct!");
                 } else {
-                     new MainPage(currentUser, db);
+                    new MainPage(currentUser, db);
                     dispose();
                 }
             }
@@ -139,7 +139,7 @@ public class Gate extends JFrame {
     }
 
     private void registerButton_Clicked(User user, Subscription subscription) {
-        if (!Validation.clientInfo(user))
+        if (!Utils.validateUser(user))
             return;
 
         try {
@@ -147,18 +147,19 @@ public class Gate extends JFrame {
                 throw new ClientAlreadyExistsException();
             else {
                 boolean result = db.insertUser(user);
+                System.out.println(result);
                 db.insertSubscription(subscription);
                 if (!result)
                     throw new RegistrationFailedException();
                 else {
+
                     System.out.println("Loading the main page.");
-                     new MainPage(user, db);
+                    new MainPage(user, db);
                     dispose();
                 }
             }
         } catch (RuntimeException ex) {
-            System.out.println(ex.getMessage());
-            JOptionPane.showMessageDialog(null, ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }
