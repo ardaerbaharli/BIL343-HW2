@@ -71,12 +71,11 @@ public class Database {
     }
 
     public boolean insertSubscription(Subscription subscription) {
-        System.out.println("Inserting a record.");
+        System.out.println("Inserting a record to subscription table.");
         final String INSERT_USERS_SQL = "INSERT INTO subscription" +
                 "  (subscriptionPlan, username, subDate) VALUES " +
                 " (?, ?, ?);";
         try (Connection connection = getConnection();
-
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USERS_SQL)) {
             preparedStatement.setString(1, subscription.getSubscriptionPlan().toString());
             preparedStatement.setString(2, subscription.getUsername());
@@ -96,37 +95,6 @@ public class Database {
         }
         return true;
 
-    }
-
-    public List<Subscription> getSubscriptionsBySubscriptionPlan(SubscriptionPlan subscriptionPlan) {
-        System.out.println("Retrieving a client.");
-        final String QUERY = "select subscriptionPlan, username, subDate from subscription where subscriptionPlan =?";
-        try (Connection connection = getConnection();
-
-             PreparedStatement preparedStatement = connection.prepareStatement(QUERY)) {
-            preparedStatement.setString(1, subscriptionPlan.toString());
-
-            ResultSet rs = preparedStatement.executeQuery();
-            List<Subscription> subList = new ArrayList<>();
-
-            while (rs.next()) {
-                SubscriptionPlan sp = SubscriptionPlan.valueOf(rs.getString("subscriptionPlan"));
-                String username = rs.getString("username");
-                LocalDate subDate = rs.getDate("subDate").toLocalDate();
-                Subscription subscription = new Subscription(sp, username, subDate);
-                subList.add(subscription);
-            }
-            return subList;
-        } catch (SQLException e) {
-            printSQLException(e);
-            return null;
-        } finally {
-            try {
-                getConnection().close();
-            } catch (SQLException e) {
-                printSQLException(e);
-            }
-        }
     }
 
     public List<Subscription> getAllSubscriptions() {
@@ -214,7 +182,7 @@ public class Database {
     }
 
     public boolean insertUser(User user) {
-        System.out.println("Inserting a record.");
+        System.out.println("Inserting a record to user table.");
         final String INSERT_USERS_SQL = "INSERT INTO users" +
                 "  (username, password, subscriptionPlan, parentalControl) VALUES " +
                 " (?, ?, ?, ?);";
@@ -238,12 +206,11 @@ public class Database {
             }
         }
         return true;
-
     }
 
 
     public boolean removeUser(String username) {
-        System.out.println("Removing a record.");
+        System.out.println("Removing a record from user table.");
         final String deleteTableSQL = "delete from users where username = ?";
 
         try (Connection connection = getConnection();
@@ -266,7 +233,7 @@ public class Database {
     }
 
     public boolean doesExistsInUsers(String username) {
-        System.out.println("Checking if the user exist.");
+        System.out.println("Checking if the user exists in user table.");
         final String QUERY = "select count(*) from users where username=?";
         try (Connection connection = getConnection();
 
@@ -290,35 +257,8 @@ public class Database {
 
     }
 
-    public void listUsers() {
-        System.out.println("Retrieving a client.");
-        final String QUERY = "select * from users";
-        try (Connection connection = getConnection();
-
-             PreparedStatement preparedStatement = connection.prepareStatement(QUERY)) {
-
-            ResultSet rs = preparedStatement.executeQuery();
-
-            while (rs.next()) {
-                String username = rs.getString("username");
-                String password = rs.getString("password");
-                SubscriptionPlan subscriptionPlan = SubscriptionPlan.valueOf(rs.getString("subscriptionPlan"));
-                boolean parentalControl = Boolean.parseBoolean(rs.getString("parentalControl"));
-                System.out.println(username + "," + password + "," + subscriptionPlan + "," + parentalControl);
-            }
-        } catch (SQLException e) {
-            printSQLException(e);
-        } finally {
-            try {
-                getConnection().close();
-            } catch (SQLException e) {
-                printSQLException(e);
-            }
-        }
-    }
-
     public List<User> getAllUsers() {
-        System.out.println("Retrieving a client.");
+        System.out.println("Retrieving a user.");
         final String QUERY = "select * from users";
         try (Connection connection = getConnection();
 
@@ -329,7 +269,6 @@ public class Database {
             while (rs.next()) {
                 String username = rs.getString("username");
                 String password = rs.getString("password");
-                SubscriptionPlan subscriptionPlan = SubscriptionPlan.valueOf(rs.getString("subscriptionPlan"));
                 boolean parentalControl = Boolean.parseBoolean(rs.getString("parentalControl"));
                 User u = new User(username, password, parentalControl);
                 u.setSubscriptions(getSubscriptionsByUsername(username));
@@ -349,7 +288,7 @@ public class Database {
     }
 
     public User getUser(String username) {
-        System.out.println("Retrieving a client.");
+        System.out.println("Retrieving a user.");
         final String QUERY = "select username, password, subscriptionPlan, parentalControl from users where username =?";
         try (Connection connection = getConnection();
 
@@ -379,7 +318,7 @@ public class Database {
     }
 
     public boolean updateUser(String username, User updatedUser) {
-        System.out.println("Updating client info.");
+        System.out.println("Updating user info.");
 
         final String UPDATE_USERS_SQL = "update users set username = ?, password =?, subscriptionPlan =?, parentalControl=? where username = ?;";
         try (Connection connection = getConnection();

@@ -236,7 +236,6 @@ public class Report {
 
     private void Write(String content) {
         try {
-            System.out.println("Writing content of characteds " + content.length());
             FileWriter fw = new FileWriter(fileName);
             fw.write(content);
             fw.close();

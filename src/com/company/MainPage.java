@@ -87,10 +87,7 @@ public class MainPage extends JFrame {
             for (int j = 0; j < movieNames[i].length; j++) {
                 Video video = new Video(movieNames[i][j], videoSize, panelSize);
 
-                if (video.getMovieName().contains("a"))
-                    video.setNeedParentalControl(true);
-                else
-                    video.setNeedParentalControl(false);
+                video.setNeedParentalControl(video.getMovieName().contains("a"));
 
                 if (user.isParentalControlOn() && video.isNeedParentalControl()) {
                     JLabel lblParental = new JLabel("Parental control.");

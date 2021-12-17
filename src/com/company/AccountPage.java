@@ -5,7 +5,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AccountPage extends JFrame {

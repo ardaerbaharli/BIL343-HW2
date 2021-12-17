@@ -21,7 +21,7 @@ public class User {
         this.setUsername(username);
         this.setPassword(password);
         this.setSubscriptions(new ArrayList<>());
-        this.setParentalControl(false);
+        this.setParentalControl(parentalControl);
     }
 
 

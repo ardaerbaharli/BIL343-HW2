@@ -32,9 +32,16 @@ public class Utils {
     }
 
     public static void cleanDirectory(String directoryPath) {
-        File directory = new File(directoryPath);
-        for (File file : directory.listFiles())
-            if (!file.isDirectory())
-                file.delete();
+        try
+        {
+            File directory = new File(directoryPath);
+            for (File file : directory.listFiles())
+                if (!file.isDirectory())
+                    file.delete();
+        }catch (NullPointerException ex)
+        {
+            System.out.println("Directory is empty.");
+        }
+
     }
 }
