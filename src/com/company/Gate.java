@@ -159,6 +159,7 @@ public class Gate extends JFrame {
                 }
             }
         } catch (RuntimeException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
             ex.printStackTrace();
         }
     }
