@@ -97,6 +97,29 @@ public class Database {
 
     }
 
+    public boolean removeSubscription(String username) {
+        System.out.println("Removing a sub from user table.");
+        final String deleteTableSQL = "delete from subscription where username = ?";
+
+        try (Connection connection = getConnection();
+
+             PreparedStatement preparedStatement = connection.prepareStatement(deleteTableSQL)) {
+            preparedStatement.setString(1, username);
+
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            printSQLException(e);
+            return false;
+        } finally {
+            try {
+                getConnection().close();
+            } catch (SQLException e) {
+                printSQLException(e);
+            }
+        }
+        return true;
+    }
+
     public List<Subscription> getAllSubscriptions() {
         System.out.println("Retrieving all subscriptions.");
         final String QUERY = "select subscriptionPlan, username, subDate from subscription";
