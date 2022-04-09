@@ -1,2 +1,2 @@
 # BIL343-HW2
-Netflix like GUI Application in Java
+Netflix like GUI Application built with Java
