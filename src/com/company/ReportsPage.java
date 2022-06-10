@@ -3,6 +3,7 @@ package com.company;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReportsPage extends JFrame {
@@ -103,7 +104,7 @@ public class ReportsPage extends JFrame {
     private void btnPlatformReports_Clicked() {
 
         try {
-            List<Subscription> subs = db.getAllSubscriptions();
+            List<Subscription> subs =  db.getAllSubscriptions();
             List<User> users = db.getAllUsers();
             Report platformReport = new Report(subs, users);
             Desktop desktop = Desktop.getDesktop();
